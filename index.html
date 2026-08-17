@@ -880,8 +880,7 @@
  *  GAS_URL : GAS「ウェブアプリ」のデプロイURL(…/exec で終わるもの)
  *            新しくデプロイし直したら、ここを新しいURLに貼り替える
  * ============================================================ */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxyJDANez3Q-WTx9NBTI8GUTBPISDD0hkIYiOh6sRY4uU1DMWES-0c2yaAdadITDPqQ/exec
-';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxyJDANez3Q-WTx9NBTI8GUTBPISDD0hkIYiOh6sRY4uU1DMWES-0c2yaAdadITDPqQ/exec';
 
 (function(){
 'use strict';
@@ -3870,9 +3869,16 @@ $('tDel').onclick=()=>{
 };
 
 /* ================= 起動 ================= */
-initTeacher();
-initName();
+window.addEventListener('error', e=>{
+  try{
+    const msg='起動エラー: '+(e.message||'')+(e.lineno?' (行'+e.lineno+')':'');
+    ['pane-home','pane-teacher'].forEach(id=>{ const el=document.getElementById(id); if(el && /読みこみ中/.test(el.textContent)) el.innerHTML='<div class="empty" style="color:var(--miss)">'+msg+'<br><span style="font-size:12px; color:var(--ink-soft)">ブラウザのキャッシュが古い可能性があります。URLの末尾に ?v=3(教員は &v=3)を付けて開き直してください</span></div>'; });
+  }catch(x){}
+});
+try{ initTeacher(); }catch(e){ console.error(e); }
+try{ initName(); }catch(e){ console.error(e); }
 load();
+setTimeout(()=>{ ['pane-home','pane-teacher'].forEach(id=>{ const el=document.getElementById(id); if(el && /^\s*読みこみ中/.test(el.textContent)) el.innerHTML='<div class="empty">サーバーの応答がありません(20秒)。<br><span style="font-size:12px">GAS_URLのデプロイが「全員がアクセス可」になっているか、新バージョンでデプロイされているかを確認してください。</span><br><button class="ghost" id="reloadBtn2" style="margin-top:10px">🔄 再読み込み</button></div>'; const b=document.getElementById('reloadBtn2'); if(b) b.onclick=()=>location.reload(); }); }, 20000);
 })();
 </script>
 </body>
